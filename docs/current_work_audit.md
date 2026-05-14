@@ -14,7 +14,7 @@ Audited source files:
 
 The existing notebook is a useful neural-network exploratory analysis, but it is not yet a publication-grade prediction-model workflow. The main reasons are: the notebook used a different 303-row `heart.csv` than the currently uploaded 1,025-row file; the uploaded benchmark file contains extensive duplicate rows; target coding between the Kaggle-style `heart.csv` and the UCI-style `heart_disease_uci.csv` is not safely aligned; model selection used the test set during neural-network tuning; and the primary evaluation is a single random split rather than site-aware validation.
 
-The notebook should therefore be preserved as historical baseline work, not treated as final scientific evidence.
+The notebook should therefore be treated as historical baseline work, not as final scientific evidence.
 
 ## Notebook Summary
 

@@ -1,4 +1,4 @@
-# Proposal Alignment and Notebook Compatibility
+# Proposal Alignment
 
 Project: Early CVD Prediction
 
@@ -24,13 +24,12 @@ This dataset change is appropriate for the current submission because the suppli
 
 ## Notebook Decision
 
-The original neural-network notebook is preserved as historical work because it shows the student's starting point. It should not be used as the final scientific notebook because it used a different 303-row `heart.csv`, tuned with the test set as validation data, and did not perform site-aware validation.
+The original neural-network notebook was audited because it shows the starting point of the work. It should not be used as the final scientific notebook because it used a different 303-row `heart.csv`, tuned with the test set as validation data, and did not perform site-aware validation.
 
-The new notebook `notebooks/Early_CVD_Prediction_ML_Lab_Supervisor_Demo.ipynb` is the recommended notebook to show the supervisor. It is aligned with the report sections, reads the real project artifacts, demonstrates the data audit, shows comparative and sensitivity studies, loads the final model bundle, and runs an individual explainable prediction.
+The final notebook is `notebooks/Early_CVD_Prediction_ML_Lab.ipynb`. It is aligned with the report sections, reads the real project artifacts, presents the data audit, shows comparative and sensitivity studies, loads the final model bundle, and runs an individual explainable prediction.
 
 ## How to Present the Dataset Change
 
 Recommended wording:
 
 > The proposal initially planned to use the Framingham dataset. During implementation, the available project materials were the UCI-style heart disease dataset and a Kaggle-style `heart.csv`. I therefore used `heart_disease_uci.csv` as the primary dataset because it contains center/hospital identifiers, allowing a stronger site-aware validation design. The project goal remains explainable early CVD/heart disease prediction, but the final claims are limited to this public benchmark setting.
-

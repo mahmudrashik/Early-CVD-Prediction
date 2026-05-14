@@ -13,7 +13,7 @@ Cardiovascular disease prediction is a common machine-learning laboratory proble
 
 ## I. Introduction
 
-Early identification of cardiovascular disease risk is an important healthcare problem and a useful applied machine-learning task. Public heart disease datasets are frequently used for student projects and benchmark experiments because they contain interpretable clinical variables such as age, chest pain type, resting blood pressure, cholesterol, exercise-induced angina, ST depression, and thalassemia-related test findings. However, simple machine-learning demonstrations can easily overstate performance if dataset duplication, preprocessing leakage, target definition, and validation design are not handled carefully.
+Early identification of cardiovascular disease risk is an important healthcare problem and a useful applied machine-learning task. Public heart disease datasets are frequently used for student projects and benchmark experiments because they contain interpretable clinical variables such as age, chest pain type, resting blood pressure, cholesterol, exercise-induced angina, ST depression, and thalassemia-related test findings. However, simple machine-learning analyses can easily overstate performance if dataset duplication, preprocessing leakage, target definition, and validation design are not handled carefully.
 
 The starting point of this work was an existing Jupyter notebook that trained feedforward neural networks for heart disease prediction. The notebook was useful as exploratory work, but it depended on a local 303-row `heart.csv` file and used a single random train-test split. The currently uploaded `heart.csv` was later found to contain extensive duplicate rows. Therefore, the final project reframed the work as a reproducible prediction-model study rather than a neural-network-only exercise.
 
@@ -117,7 +117,7 @@ The duplicate sensitivity study used the supplementary `heart.csv` file. The dup
 
 ### C. Threshold Sensitivity
 
-Threshold analysis showed the trade-off between sensitivity and specificity. At threshold 0.10, sensitivity was 0.988 but specificity was only 0.214. At threshold 0.50, sensitivity was 0.729 and specificity was 0.842. This demonstrates why the deployed app reports probability and risk category rather than claiming a universal clinical decision threshold.
+Threshold analysis showed the trade-off between sensitivity and specificity. At threshold 0.10, sensitivity was 0.988 but specificity was only 0.214. At threshold 0.50, sensitivity was 0.729 and specificity was 0.842. This supports why the deployed app reports probability and risk category rather than claiming a universal clinical decision threshold.
 
 ## VII. Localhost Prototype
 
@@ -140,4 +140,3 @@ Future work should include prospective validation, larger and more modern datase
 [4] F. Pedregosa et al., "Scikit-learn: Machine Learning in Python," Journal of Machine Learning Research, vol. 12, pp. 2825-2830, 2011.
 
 [5] S. M. Lundberg and S.-I. Lee, "A Unified Approach to Interpreting Model Predictions," Advances in Neural Information Processing Systems, 2017.
-

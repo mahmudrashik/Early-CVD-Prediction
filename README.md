@@ -154,9 +154,8 @@ This gives a more honest estimate than a single random split.
 ## Important Limitation
 
 The data are small, historical, public benchmark datasets.  
-The results are useful for ML research, education, and portfolio demonstration, but not for clinical deployment.
+The results are useful for ML research, education, and portfolio presentation, but not for clinical deployment.
 
 ## Tech Stack
 
 Python, pandas, scikit-learn, FastAPI, Pydantic, Jinja2, MLflow, DVC, pytest, Docker, GitHub Actions.
-

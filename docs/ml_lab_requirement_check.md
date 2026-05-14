@@ -2,7 +2,7 @@
 
 ## Requirement Match
 
-The project mostly matches the ML Lab project requirements, but the original short manuscript scaffold was not enough for final submission. The codebase and generated results are strong; the report needed to be rewritten into the required IEEE-style sections.
+The project matches the ML Lab project requirements after the report and notebook cleanup. The codebase, generated results, IEEE-style report draft, final notebook, figures, tables, and localhost app are aligned with the required submission structure.
 
 ## Required Sections
 
@@ -29,7 +29,7 @@ Use the term **Comparative and Sensitivity Studies** in the report. It is suppor
 1. **Model comparison**: logistic regression, random forest, gradient boosting, calibrated gradient boosting, and MLP baseline.
 2. **Duplicate sensitivity**: original duplicate-expanded `heart.csv` versus deduplicated `heart.csv`.
 3. **Threshold sensitivity**: performance from thresholds 0.10 to 0.90.
-4. **Notebook baseline comparison**: original neural-network work is preserved as a comparator, but not treated as final evidence.
+4. **Notebook baseline comparison**: original neural-network work is retained as a comparator, but not treated as final evidence.
 
 This is acceptable for the lab section titled **Ablation Studies / Comparative Studies**. Strict feature-removal ablation was not the main design because the dataset is small and center-shifted; model and data sensitivity studies are more scientifically honest here.
 
@@ -69,9 +69,9 @@ The methodology is:
 10. Select final model using discrimination, calibration, stability, and interpretability.
 11. Generate explanations and deploy through FastAPI.
 
-## Is the Notebook Compatible?
+## Notebook Compatibility
 
-Partially. The notebook is compatible as historical baseline work, not as the final scientific result.
+The exploratory notebook is compatible as historical baseline work, not as the final scientific result.
 
 Main issue:
 
@@ -81,8 +81,9 @@ Main issue:
 
 How the final project relates to the notebook:
 
-- The notebook is preserved in `notebooks/`.
-- The notebook's neural-network idea is preserved as the `mlp_notebook_baseline` comparator.
+- The exploratory notebook was audited in `docs/current_work_audit.md`.
+- The neural-network idea is retained as the `mlp_notebook_baseline` comparator.
+- The final project notebook is `notebooks/Early_CVD_Prediction_ML_Lab.ipynb`.
 - The final project improves the notebook by using leakage-safe pipelines, site-aware validation, calibration metrics, reproducible reports, and a deployable app.
 
 ## Final Recommendation

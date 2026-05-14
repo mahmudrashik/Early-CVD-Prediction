@@ -1,7 +1,7 @@
 # Structured Abstract
 
 ## Background
-Public heart disease datasets are widely used for machine-learning demonstrations, but many analyses rely on random splits, duplicate-prone benchmark files, and incomplete leakage assessment.
+Public heart disease datasets are widely used for machine-learning teaching examples and benchmark studies, but many analyses rely on random splits, duplicate-prone benchmark files, and incomplete leakage assessment.
 
 ## Objective
 To develop a reproducible, leakage-audited early cardiovascular disease prediction benchmark using center-aware internal-external validation on UCI-style heart disease data.
