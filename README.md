@@ -17,7 +17,7 @@ The project turns notebook experiments into a reproducible ML pipeline, evaluati
 - Selected the final model using discrimination, calibration, stability, and interpretability, not accuracy alone.
 - Added explainable prediction output for the frontend.
 - Built a FastAPI localhost app with a clinical-style input form, probability, risk category, explanation panel, metadata, and disclaimer.
-- Generated research reports, figures, tables, model card, manuscript draft, tests, Docker files, and CI workflow.
+- Generated the project paper, figures, tables, model card, tests, Docker files, and CI workflow.
 
 ## Final Model
 
@@ -44,7 +44,7 @@ Primary site-aware mean results:
 ```text
 configs/              Reproducible project configuration
 data/raw/             Provided datasets
-docs/                 Current work, data, leakage, and architecture audits
+docs/                 Current work, data, and leakage audits
 src/                  Clean Python package
 src/domain/           Feature definitions and risk rules
 src/application/      Training, evaluation, and reporting use cases
@@ -127,15 +127,14 @@ pytest
 docker compose -f docker/docker-compose.yml up --build
 ```
 
-## Main Reports
+## Main Files
 
 - `docs/current_work_audit.md`
 - `docs/data_audit_report.md`
 - `docs/leakage_audit_report.md`
-- `docs/architecture.md`
 - `reports/model_card.md`
-- `reports/final_executive_summary.md`
-- `reports/manuscript/manuscript_draft.md`
+- `reports/manuscript/ieee_ml_lab_report.md`
+- `reports/manuscript/early_cvd_ieee_lab_report.docx`
 
 ## Methodology Summary
 

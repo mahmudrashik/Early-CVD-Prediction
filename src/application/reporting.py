@@ -34,8 +34,8 @@ def write_data_and_leakage_reports(config: dict[str, Any]) -> dict[str, pd.DataF
 
     source_manifest = pd.DataFrame(
         [
-            {"file": str(primary_path), "sha256": sha256(primary_path), "rows": len(primary), "role": "primary"},
-            {"file": str(secondary_path), "sha256": sha256(secondary_path), "rows": len(secondary_original), "role": "supplementary"},
+            {"file": str(paths["primary_raw"]), "sha256": sha256(primary_path), "rows": len(primary), "role": "primary"},
+            {"file": str(paths["secondary_raw"]), "sha256": sha256(secondary_path), "rows": len(secondary_original), "role": "supplementary"},
         ]
     )
     source_manifest.to_csv(tables_dir / "source_manifest.csv", index=False)
@@ -70,9 +70,6 @@ def write_data_and_leakage_reports(config: dict[str, Any]) -> dict[str, pd.DataF
 
     _write_data_audit_doc(primary, secondary_original, secondary_dedup, missing_primary, duplicate_table, source_manifest)
     _write_leakage_doc(secondary_original, secondary_dedup)
-    _write_architecture_doc()
-    _write_manuscript_scaffold()
-    _write_supplementary_scaffold()
     return {
         "primary": primary,
         "secondary_dedup": secondary_dedup,
@@ -83,29 +80,9 @@ def write_data_and_leakage_reports(config: dict[str, Any]) -> dict[str, pd.DataF
 
 
 def write_result_documents(config: dict[str, Any], champion: str, summary: pd.DataFrame, bootstrap: pd.DataFrame) -> None:
-    manuscript_dir = resolve_path(config["paths"]["manuscript_dir"])
     reports_dir = resolve_path(config["paths"]["reports_dir"])
-    manuscript_dir.mkdir(parents=True, exist_ok=True)
     reports_dir.mkdir(parents=True, exist_ok=True)
     top = summary.loc[summary["model"] == champion].iloc[0]
-    abstract = f"""# Structured Abstract
-
-## Background
-Public heart disease datasets are widely used for machine-learning teaching examples and benchmark studies, but many analyses rely on random splits, duplicate-prone benchmark files, and incomplete leakage assessment.
-
-## Objective
-To develop a reproducible, leakage-audited early cardiovascular disease prediction benchmark using center-aware internal-external validation on UCI-style heart disease data.
-
-## Methods
-The primary dataset was `heart_disease_uci.csv` with four centers. The binary outcome was defined as `num > 0`. Candidate models included penalized logistic regression, random forest, gradient boosting, calibrated gradient boosting, and a feedforward multilayer perceptron comparator preserving the original notebook baseline. Preprocessing, imputation, scaling, and encoding were fitted inside resampling folds. Each center was held out once as an external-style validation fold.
-
-## Results
-The selected model was `{champion}`. Across held-out centers, mean AUROC was {top['auroc_mean']:.3f}, mean AUPRC was {top['auprc_mean']:.3f}, mean Brier score was {top['brier_mean']:.3f}, and mean balanced accuracy at threshold 0.50 was {top['balanced_accuracy_mean']:.3f}. These results should be interpreted as public-dataset benchmark performance, not clinical deployment evidence.
-
-## Conclusions
-The project provides a reproducible benchmark and localhost research prototype. Prospective validation, clinical workflow evaluation, and dataset modernization would be required before clinical use.
-"""
-    (manuscript_dir / "structured_abstract.md").write_text(abstract, encoding="utf-8")
 
     model_card = f"""# Final Model Card
 
@@ -138,23 +115,6 @@ Leave-one-center-out internal-external cross-validation using the UCI dataset ce
 The public datasets are small, historical, partially missing, and not representative of modern prospective care. The supplementary `heart.csv` file has extensive duplicate rows and uncertain target semantics relative to the UCI `num > 0` definition.
 """
     (reports_dir / "model_card.md").write_text(model_card, encoding="utf-8")
-
-    executive = f"""# Final Executive Summary
-
-The selected model for the primary UCI site-aware analysis is `{champion}`. It was chosen because its overall ranking balanced discrimination, calibration, stability across held-out centers, and interpretability rather than optimizing test accuracy alone.
-
-The original notebook's neural-network work has been preserved as a comparator. Its reported tuned-model accuracy is not treated as final evidence because the notebook used a different 303-row file and used the test split during tuning.
-
-Primary aggregate held-out-center performance for `{champion}`:
-
-- AUROC: {top['auroc_mean']:.3f}
-- AUPRC: {top['auprc_mean']:.3f}
-- Brier score: {top['brier_mean']:.3f}
-- Balanced accuracy: {top['balanced_accuracy_mean']:.3f}
-
-The localhost application serves this selected model artifact and provides calibrated probability, risk category, and local explanation text. It includes a research-prototype disclaimer.
-"""
-    (reports_dir / "final_executive_summary.md").write_text(executive, encoding="utf-8")
 
 
 def _write_data_audit_doc(primary: pd.DataFrame, secondary_original: pd.DataFrame, secondary_dedup: pd.DataFrame, missing: pd.DataFrame, duplicates: pd.DataFrame, manifest: pd.DataFrame) -> None:
@@ -219,77 +179,3 @@ def _write_leakage_doc(secondary_original: pd.DataFrame, secondary_dedup: pd.Dat
    - Control: source file hashes, configuration, selected model metadata, and validation tables are written to `reports/` and `artifacts/`.
 """
     Path("docs/leakage_audit_report.md").write_text(doc, encoding="utf-8")
-
-
-def _write_architecture_doc() -> None:
-    doc = """# Final Project Architecture
-
-## Layers
-
-- `src/domain`: feature definitions, target rules, and risk-category rules.
-- `src/application`: training, evaluation, calibration, and reporting use cases.
-- `src/infrastructure`: CSV readers, configuration loading, persistence, and MLflow adapter.
-- `src/interfaces`: command-line interface.
-- `src/api`: FastAPI controllers and Pydantic request/response schemas.
-- `src/webapp`: localhost frontend templates and static assets.
-- `tests`: unit, integration, and API contract tests.
-
-## Design Decisions
-
-The web application uses FastAPI with integrated Jinja templates. This is cleaner than adding a second Streamlit service because the project needs one public prediction workflow, automatic API documentation, typed request validation, and a single deployable localhost process.
-
-The prediction path does not use an LLM framework. Explanations are derived from the fitted model artifact and feature dictionary.
-
-The hospital/center field is used for internal-external validation and excluded from model predictors to avoid learning center prevalence shortcuts.
-"""
-    Path("docs/architecture.md").write_text(doc, encoding="utf-8")
-
-
-def _write_manuscript_scaffold() -> None:
-    manuscript = """# Manuscript Draft
-
-## Title Options
-
-1. Leakage-Audited Early Heart Disease Prediction Using Site-Aware Internal-External Validation on Public UCI Data
-2. Calibration-Aware Machine Learning for Early Cardiovascular Disease Prediction: A Reproducible Public-Dataset Benchmark
-3. From Notebook to Research Prototype: A Site-Aware and Explainable Heart Disease Prediction Pipeline
-
-## Introduction
-
-Machine-learning models for heart disease prediction are frequently reported using public datasets, but many studies rely on random train-test splits, limited calibration assessment, and incomplete attention to duplicate records or site-level heterogeneity. These weaknesses can overstate model performance and limit scientific reproducibility.
-
-## Methods
-
-The primary analysis uses `heart_disease_uci.csv`. The binary outcome is disease presence, defined as `num > 0`. Candidate models are evaluated with leave-one-center-out internal-external validation. All preprocessing steps are fitted within resampling folds.
-
-## Results
-
-Results are produced with `early-cvd train` and written to `reports/tables/`. The structured abstract and model card are updated after training.
-
-## Discussion
-
-This work should be interpreted as a reproducible public-dataset benchmark and educational decision-support prototype. It is not evidence of clinical deployment readiness.
-
-## Ethics and Data Use
-
-The project uses public benchmark data and does not introduce new patient data collection. Historical public datasets may contain demographic, measurement, and referral biases.
-
-## Reproducibility
-
-The repository includes configuration files, data hashes, Docker instructions, DVC stage metadata, tests, and a localhost API.
-"""
-    Path("reports/manuscript/manuscript_draft.md").write_text(manuscript, encoding="utf-8")
-
-
-def _write_supplementary_scaffold() -> None:
-    supplementary = """# Supplementary Materials Draft
-
-## Supplementary Dataset Note
-
-The uploaded `heart.csv` is not used as the primary research dataset. It contains extensive exact duplicates and is evaluated only after deduplication.
-
-## Reporting Standards Alignment
-
-The project is structured to align with TRIPOD+AI, PROBAST+AI, STROBE, and clustered-data reporting principles by documenting source data, missingness, candidate models, validation grouping, calibration, and limitations.
-"""
-    Path("reports/supplementary/supplementary_materials.md").write_text(supplementary, encoding="utf-8")

@@ -344,7 +344,7 @@ The notebook should be migrated as follows:
 11. Add an XAI layer that gives global and local explanations in clinically understandable language while avoiding causal claims.
 12. Deploy the final selected model through FastAPI with one public prediction workflow.
 13. Track experiments with MLflow and preserve serialized model/preprocessing artifacts.
-14. Add tests, CI, Docker, DVC metadata, README, model card, manuscript draft, and supplementary materials.
+14. Add tests, CI, Docker, DVC metadata, README, model card, and IEEE-style project paper.
 
 ## Recommended Research Plan
 

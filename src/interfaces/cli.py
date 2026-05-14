@@ -12,7 +12,7 @@ app = typer.Typer(help="Early CVD Prediction research pipeline.")
 
 @app.command()
 def generate_report(config: str = typer.Option("configs/default.yaml", "--config", "-c")) -> None:
-    """Generate data, leakage, architecture, manuscript, and supplementary report scaffolds."""
+    """Generate the data and leakage audit reports."""
     cfg = load_config(config)
     write_data_and_leakage_reports(cfg)
     typer.echo("Generated audit and report files.")
@@ -40,4 +40,3 @@ def serve(host: str = "127.0.0.1", port: int = 8000) -> None:
 
 if __name__ == "__main__":
     app()
-
