@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Research prototype for early cardiovascular disease risk prediction using site-aware machine learning models on public benchmark data.">
-    <title>Early CVD Prediction — Research Prototype</title>
+    <title>Early CVD Prediction - Research Prototype</title>
     <link rel="stylesheet" href="/static/styles.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❤️</text></svg>">
+    <link rel="icon" href="data:,">
   </head>
   <body>
     <main class="shell">
@@ -21,7 +21,7 @@
           </div>
           <h1>Early CVD Prediction</h1>
         </div>
-        <p class="subtitle">Research Prototype · Site-Aware ML Risk Assessment</p>
+        <p class="subtitle">Research Prototype - Site-Aware ML Risk Assessment</p>
       </header>
 
       <!-- Main Content -->
@@ -99,7 +99,7 @@
               </label>
               <label>Oldpeak
                 <input name="oldpeak" type="number" step="0.1" min="-5" max="10" value="1.0" required>
-                <span class="field-help">ST depression during exercise compared to rest. Higher numbers suggest worse heart stress.</span>
+                <span class="field-help">Exercise-induced ST depression compared with rest. Form range: -5 to 10; higher values usually indicate more concerning exercise ECG change.</span>
               </label>
               <label>ST Slope
                 <select name="slope">
@@ -107,20 +107,20 @@
                   <option>flat</option>
                   <option>downsloping</option>
                 </select>
-                <span class="field-help">Direction of heart wave during exercise. Downsloping is more concerning than upsloping.</span>
+                <span class="field-help">Slope of the peak exercise ST segment: upsloping, flat, or downsloping. Flat/downsloping patterns are generally more concerning in this benchmark.</span>
               </label>
               <label>Major Vessels
                 <input name="ca" type="number" min="0" max="4" value="0" required>
-                <span class="field-help">Number of major heart vessels with narrowing (0-4). More vessels = higher risk.</span>
+                <span class="field-help">Number of major vessels colored by fluoroscopy. Accepted range: 0-4; higher counts often increase model-estimated risk.</span>
               </label>
               <label>Thal
                 <select name="thal">
                   <option>normal</option>
                   <option>fixed defect</option>
-                  <option>reversable defect</option>
+                  <option value="reversable defect">reversible defect</option>
                   <option>unknown</option>
                 </select>
-                <span class="field-help">Heart imaging defect type. Reversible defects suggest active blood flow problems.</span>
+                <span class="field-help">Thalassemia/stress-test defect category: normal, fixed defect, reversible defect, or unknown. Reversible defects often signal stress-related blood-flow abnormality.</span>
               </label>
             </div>
             <button type="submit" id="predict-btn">
@@ -149,8 +149,8 @@
 
         // Show loading state
         btn.disabled = true;
-        btn.innerHTML = '<span class="loading-spinner"></span> Analyzing…';
-        result.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Processing prediction…</div>';
+        btn.innerHTML = '<span class="loading-spinner"></span> Analyzing...';
+        result.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Processing prediction...</div>';
 
         const data = Object.fromEntries(new FormData(form).entries());
         ["age", "trestbps", "chol", "thalach", "oldpeak", "ca"].forEach((key) => data[key] = Number(data[key]));
@@ -202,7 +202,7 @@
               <ul class="explanation-list">
                 ${payload.explanation.map((item) => `
                   <li class="explanation-item">
-                    <strong>${item.feature}</strong> — ${item.direction}. ${item.clinical_note}
+                    <strong>${item.feature}</strong> - ${item.direction}. ${item.clinical_note}
                   </li>
                 `).join("")}
               </ul>
