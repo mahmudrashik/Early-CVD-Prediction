@@ -1,0 +1,21 @@
+model,held_out_center,best_params,inner_best_score
+logistic_l2,Cleveland,"{""classifier__C"": 0.1}",0.7631653136577309
+random_forest,Cleveland,"{""classifier__max_depth"": 4, ""classifier__min_samples_leaf"": 5}",0.780070490331234
+gradient_boosting,Cleveland,"{""classifier__learning_rate"": 0.03, ""classifier__max_depth"": 2, ""classifier__n_estimators"": 60}",0.7521757059840818
+calibrated_gradient_boosting,Cleveland,{},0.7474491923258525
+mlp_notebook_baseline,Cleveland,"{""classifier__alpha"": 0.01, ""classifier__hidden_layer_sizes"": [72, 64, 24]}",0.7428253801504335
+logistic_l2,Hungary,"{""classifier__C"": 0.1}",0.7316299758746173
+random_forest,Hungary,"{""classifier__max_depth"": 4, ""classifier__min_samples_leaf"": 5}",0.7396100234296631
+gradient_boosting,Hungary,"{""classifier__learning_rate"": 0.03, ""classifier__max_depth"": 2, ""classifier__n_estimators"": 120}",0.7633149053910611
+calibrated_gradient_boosting,Hungary,{},0.7398025316882699
+mlp_notebook_baseline,Hungary,"{""classifier__alpha"": 0.0001, ""classifier__hidden_layer_sizes"": [72, 64, 24]}",0.6224396021570102
+logistic_l2,Switzerland,"{""classifier__C"": 0.1}",0.8281435332563669
+random_forest,Switzerland,"{""classifier__max_depth"": 4, ""classifier__min_samples_leaf"": 1}",0.8239433131924434
+gradient_boosting,Switzerland,"{""classifier__learning_rate"": 0.03, ""classifier__max_depth"": 2, ""classifier__n_estimators"": 120}",0.8246860446998615
+calibrated_gradient_boosting,Switzerland,{},0.8297211764730674
+mlp_notebook_baseline,Switzerland,"{""classifier__alpha"": 0.0001, ""classifier__hidden_layer_sizes"": [72, 64, 24]}",0.8348493031604908
+logistic_l2,VA Long Beach,"{""classifier__C"": 0.1}",0.8243451856019669
+random_forest,VA Long Beach,"{""classifier__max_depth"": null, ""classifier__min_samples_leaf"": 5}",0.8411451853024956
+gradient_boosting,VA Long Beach,"{""classifier__learning_rate"": 0.03, ""classifier__max_depth"": 2, ""classifier__n_estimators"": 60}",0.8229066160327978
+calibrated_gradient_boosting,VA Long Beach,{},0.8279297899850705
+mlp_notebook_baseline,VA Long Beach,"{""classifier__alpha"": 0.01, ""classifier__hidden_layer_sizes"": [72, 64, 24]}",0.7940357370918486

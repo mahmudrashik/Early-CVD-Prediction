@@ -1,0 +1,26 @@
+stages:
+  audit:
+    cmd: python -m interfaces.cli generate-report --config configs/default.yaml
+    deps:
+      - data/raw/heart_disease_uci.csv
+      - data/raw/heart.csv
+      - src
+      - configs/default.yaml
+    outs:
+      - docs/data_audit_report.md
+      - docs/leakage_audit_report.md
+      - reports/figures
+      - reports/tables
+  train:
+    cmd: python -m interfaces.cli train --config configs/default.yaml
+    deps:
+      - data/raw/heart_disease_uci.csv
+      - data/raw/heart.csv
+      - src
+      - configs/default.yaml
+    outs:
+      - artifacts/model_bundle.joblib
+      - reports/tables/model_comparison.csv
+      - reports/tables/center_metrics.csv
+      - reports/tables/threshold_analysis.csv
+

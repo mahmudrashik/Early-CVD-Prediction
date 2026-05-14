@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Research prototype for early cardiovascular disease risk prediction using site-aware machine learning models on public benchmark data.">
+    <title>Early CVD Prediction — Research Prototype</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❤️</text></svg>">
+  </head>
+  <body>
+    <main class="shell">
+
+      <!-- Header -->
+      <header class="app-header">
+        <div class="logo-row">
+          <div class="heart-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+          </div>
+          <h1>Early CVD Prediction</h1>
+        </div>
+        <p class="subtitle">Research Prototype · Site-Aware ML Risk Assessment</p>
+      </header>
+
+      <!-- Main Content -->
+      <section class="workspace">
+
+        <!-- Side Panel -->
+        <aside class="panel">
+          <div class="brand">Model Information</div>
+          <div class="meta">
+            <span>Active Model</span>
+            <strong>{{ metadata.model_name }}</strong>
+          </div>
+          <p class="disclaimer">{{ metadata.disclaimer }}</p>
+          <a class="docs-link" href="/docs">API Documentation</a>
+        </aside>
+
+        <!-- Prediction Form -->
+        <section class="form-surface">
+          <h2 class="form-title">Patient Parameters</h2>
+          <form id="prediction-form">
+            <div class="grid">
+              <label>Age
+                <input name="age" type="number" min="18" max="100" value="54" required>
+                <span class="field-help">Patient's age in years. Older age generally increases heart disease risk.</span>
+              </label>
+              <label>Sex
+                <select name="sex">
+                  <option>Male</option>
+                  <option>Female</option>
+                </select>
+                <span class="field-help">Biological sex. Used to adjust risk calculations based on medical data.</span>
+              </label>
+              <label>Chest Pain
+                <select name="cp">
+                  <option>asymptomatic</option>
+                  <option>non-anginal</option>
+                  <option>atypical angina</option>
+                  <option>typical angina</option>
+                </select>
+                <span class="field-help">Type of chest pain experienced. Typical angina usually indicates higher risk.</span>
+              </label>
+              <label>Resting BP
+                <input name="trestbps" type="number" min="60" max="260" value="130" required>
+                <span class="field-help">Blood pressure at rest (mmHg). Higher pressure is a risk factor for heart disease.</span>
+              </label>
+              <label>Cholesterol
+                <input name="chol" type="number" min="80" max="700" value="240" required>
+                <span class="field-help">Blood cholesterol level (mg/dL). Higher cholesterol increases heart disease risk.</span>
+              </label>
+              <label>Fasting Sugar
+                <select name="fbs">
+                  <option value="false">False</option>
+                  <option value="true">True</option>
+                </select>
+                <span class="field-help">Is fasting blood sugar above 120 mg/dL? High sugar suggests diabetes risk.</span>
+              </label>
+              <label>Resting ECG
+                <select name="restecg">
+                  <option>normal</option>
+                  <option>st-t abnormality</option>
+                  <option>lv hypertrophy</option>
+                </select>
+                <span class="field-help">Electrocardiogram results at rest. Abnormalities indicate heart stress or damage.</span>
+              </label>
+              <label>Max Heart Rate
+                <input name="thalach" type="number" min="40" max="230" value="150" required>
+                <span class="field-help">Maximum heart rate achieved during exercise (beats/minute). Lower rates may indicate heart problems.</span>
+              </label>
+              <label>Exercise Angina
+                <select name="exang">
+                  <option value="false">False</option>
+                  <option value="true">True</option>
+                </select>
+                <span class="field-help">Did chest pain occur during exercise? Yes usually means higher risk.</span>
+              </label>
+              <label>Oldpeak
+                <input name="oldpeak" type="number" step="0.1" min="-5" max="10" value="1.0" required>
+                <span class="field-help">ST depression during exercise compared to rest. Higher numbers suggest worse heart stress.</span>
+              </label>
+              <label>ST Slope
+                <select name="slope">
+                  <option>upsloping</option>
+                  <option>flat</option>
+                  <option>downsloping</option>
+                </select>
+                <span class="field-help">Direction of heart wave during exercise. Downsloping is more concerning than upsloping.</span>
+              </label>
+              <label>Major Vessels
+                <input name="ca" type="number" min="0" max="4" value="0" required>
+                <span class="field-help">Number of major heart vessels with narrowing (0-4). More vessels = higher risk.</span>
+              </label>
+              <label>Thal
+                <select name="thal">
+                  <option>normal</option>
+                  <option>fixed defect</option>
+                  <option>reversable defect</option>
+                  <option>unknown</option>
+                </select>
+                <span class="field-help">Heart imaging defect type. Reversible defects suggest active blood flow problems.</span>
+              </label>
+            </div>
+            <button type="submit" id="predict-btn">
+              <span class="btn-text">Predict Risk</span>
+            </button>
+          </form>
+        </section>
+
+        <!-- Result Panel -->
+        <section class="result-surface" id="result">
+          <div class="empty">
+            <span>Submit patient parameters to generate a risk assessment.</span>
+          </div>
+        </section>
+
+      </section>
+    </main>
+
+    <script>
+      const form = document.querySelector("#prediction-form");
+      const result = document.querySelector("#result");
+      const btn = document.querySelector("#predict-btn");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        // Show loading state
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Analyzing…';
+        result.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Processing prediction…</div>';
+
+        const data = Object.fromEntries(new FormData(form).entries());
+        ["age", "trestbps", "chol", "thalach", "oldpeak", "ca"].forEach((key) => data[key] = Number(data[key]));
+
+        try {
+          const response = await fetch("/api/predict", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+          });
+
+          if (!response.ok) {
+            result.innerHTML = `<div class="error">${await response.text()}</div>`;
+            btn.disabled = false;
+            btn.innerHTML = '<span class="btn-text">Predict Risk</span>';
+            return;
+          }
+
+          const payload = await response.json();
+          const pct = Math.round(payload.probability * 1000) / 10;
+          const riskClass = payload.risk_category;
+
+          result.innerHTML = `
+            <div class="risk-result">
+              <div class="risk-badge ${riskClass}">
+                <span class="dot"></span>
+                ${riskClass} Risk
+              </div>
+
+              <div class="probability-display">
+                <div class="probability-number ${riskClass}">${pct}%</div>
+                <div class="probability-label">Estimated Probability</div>
+              </div>
+
+              <div class="risk-bar-container">
+                <div class="risk-bar-track">
+                  <div class="risk-bar-fill ${riskClass}" style="width: ${pct}%"></div>
+                </div>
+                <div class="risk-bar-labels">
+                  <span>0%</span>
+                  <span>50%</span>
+                  <span>100%</span>
+                </div>
+              </div>
+
+              <p class="risk-message">${payload.message}</p>
+
+              <h3 class="explanation-title">Key Contributing Factors</h3>
+              <ul class="explanation-list">
+                ${payload.explanation.map((item) => `
+                  <li class="explanation-item">
+                    <strong>${item.feature}</strong> — ${item.direction}. ${item.clinical_note}
+                  </li>
+                `).join("")}
+              </ul>
+
+              <p class="result-disclaimer">${payload.disclaimer}</p>
+            </div>
+          `;
+        } catch (err) {
+          result.innerHTML = `<div class="error">Connection error: ${err.message}</div>`;
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = '<span class="btn-text">Predict Risk</span>';
+      });
+    </script>
+  </body>
+</html>

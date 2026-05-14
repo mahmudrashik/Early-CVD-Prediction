@@ -1,0 +1,3 @@
+dataset,rows,target_absent,target_present,note
+primary_uci,920,411,509,"primary, site-aware"
+heart_csv_deduplicated,302,138,164,supplementary only; target semantics not pooled with UCI

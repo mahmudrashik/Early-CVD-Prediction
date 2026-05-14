@@ -1,0 +1,14 @@
+name,label,kind,description,clinical_note
+age,Age,numeric,Age in years.,Older age is generally associated with higher cardiovascular risk.
+sex,Sex,categorical,Recorded biological sex in the source dataset.,Sex can reflect baseline risk differences and historical referral patterns.
+cp,Chest pain type,categorical,Chest pain category.,Asymptomatic or atypical presentations may carry different risk patterns in these benchmark datasets.
+trestbps,Resting blood pressure,numeric,Resting systolic blood pressure in mm Hg.,Higher resting blood pressure is a recognized cardiovascular risk marker.
+chol,Serum cholesterol,numeric,Serum cholesterol in mg/dL.,"Elevated cholesterol may contribute to cardiovascular risk, although this dataset has measurement and provenance limitations."
+fbs,Fasting blood sugar > 120 mg/dL,categorical,Boolean fasting blood sugar indicator.,Hyperglycemia can co-occur with metabolic cardiovascular risk.
+restecg,Resting ECG,categorical,Resting electrocardiographic result.,Abnormal ECG findings may influence predicted risk.
+thalach,Maximum heart rate achieved,numeric,Maximum heart rate achieved.,Lower achieved heart rate can indicate reduced exercise tolerance in this dataset.
+exang,Exercise-induced angina,categorical,Exercise-induced angina indicator.,Exercise-induced angina is often a strong risk signal in these data.
+oldpeak,ST depression,numeric,ST depression induced by exercise relative to rest.,Higher ST depression can indicate ischemic changes.
+slope,ST segment slope,categorical,Slope of the peak exercise ST segment.,Flat or downsloping ST segments may be associated with higher risk.
+ca,Major vessels,numeric,Number of major vessels colored by fluoroscopy.,"More affected vessels can be associated with disease, but missingness is substantial outside Cleveland."
+thal,Thalassemia / stress test result,categorical,Thalassemia/stress-test result coding in the source data.,Reversible defect often contributes strongly in Cleveland-style datasets.
