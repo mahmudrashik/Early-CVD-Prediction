@@ -13,7 +13,7 @@ The project turns notebook experiments into a reproducible ML pipeline, evaluati
 - Standardized schema differences such as `thalach` vs `thalch` and `target` vs `num`.
 - Built leakage-safe preprocessing with imputation, encoding, and scaling inside model pipelines.
 - Used site-aware internal-external validation by holding out one center at a time.
-- Compared logistic regression, random forest, gradient boosting, calibrated boosting, and an MLP baseline.
+- Compared logistic regression, random forest, gradient boosting, calibrated boosting, RBF SVM, XGBoost, LightGBM, CatBoost, stacking, and an MLP baseline.
 - Selected the final model using discrimination, calibration, stability, and interpretability, not accuracy alone.
 - Added explainable prediction output for the frontend.
 - Built a FastAPI localhost app with a clinical-style input form, probability, risk category, explanation panel, metadata, and disclaimer.
@@ -21,23 +21,32 @@ The project turns notebook experiments into a reproducible ML pipeline, evaluati
 
 ## Final Model
 
-The selected model is **penalized logistic regression**.
+The selected model is **calibrated gradient boosting**.
 
 It was chosen because it gave the best overall balance of:
 
-- stable site-aware validation performance
-- good calibration behavior
-- interpretability
-- simple deployment
+- highest composite selection score across discrimination, calibration, MCC, F1, and stability
+- best mean Brier score among the compared models
+- strong pooled held-out-center AUROC and AUPRC
+- calibrated probability output suitable for the localhost prototype
 
 Primary site-aware mean results:
 
 | Metric | Value |
 |---|---:|
-| AUROC | 0.799 |
-| AUPRC | 0.880 |
-| Brier score | 0.168 |
-| Balanced accuracy | 0.745 |
+| AUROC | 0.808 |
+| AUPRC | 0.882 |
+| Brier score | 0.155 |
+| Balanced accuracy | 0.744 |
+
+Pooled held-out-center results at threshold 0.50:
+
+| Metric | Value |
+|---|---:|
+| AUROC | 0.859 |
+| AUPRC | 0.866 |
+| Sensitivity | 0.806 |
+| Specificity | 0.762 |
 
 ## What Is Inside
 

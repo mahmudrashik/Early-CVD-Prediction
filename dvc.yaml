@@ -23,4 +23,6 @@ stages:
       - reports/tables/model_comparison.csv
       - reports/tables/center_metrics.csv
       - reports/tables/threshold_analysis.csv
-
+      - reports/tables/statistical_tests.csv
+      - reports/tables/delong_pairwise.csv
+      - reports/tables/comprehensive_model_comparison.csv

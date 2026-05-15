@@ -1,3 +1,8 @@
+"""Data audit, leakage audit, and result document generation.
+
+Produces IEEE-ready markdown reports covering data provenance, missingness,
+duplicate handling, validation design, and final model performance.
+"""
 from __future__ import annotations
 
 import hashlib
@@ -32,12 +37,12 @@ def write_data_and_leakage_reports(config: dict[str, Any]) -> dict[str, pd.DataF
     secondary_dedup = load_secondary_dataset(secondary_path, deduplicate=True)
     secondary_original = load_secondary_dataset(secondary_path, deduplicate=False)
 
-    source_manifest = pd.DataFrame(
-        [
-            {"file": str(paths["primary_raw"]), "sha256": sha256(primary_path), "rows": len(primary), "role": "primary"},
-            {"file": str(paths["secondary_raw"]), "sha256": sha256(secondary_path), "rows": len(secondary_original), "role": "supplementary"},
-        ]
-    )
+    source_manifest = pd.DataFrame([
+        {"file": str(paths["primary_raw"]), "sha256": sha256(primary_path),
+         "rows": len(primary), "role": "primary"},
+        {"file": str(paths["secondary_raw"]), "sha256": sha256(secondary_path),
+         "rows": len(secondary_original), "role": "supplementary"},
+    ])
     source_manifest.to_csv(tables_dir / "source_manifest.csv", index=False)
 
     missing_primary = primary.isna().sum().reset_index()
@@ -48,38 +53,38 @@ def write_data_and_leakage_reports(config: dict[str, Any]) -> dict[str, pd.DataF
     class_by_center = primary.groupby([GROUP_COLUMN, TARGET_BINARY]).size().reset_index(name="n")
     class_by_center.to_csv(tables_dir / "class_by_center.csv", index=False)
 
-    duplicate_table = pd.DataFrame(
-        [
-            {"dataset": "heart_disease_uci.csv", "rows": len(primary), "exact_duplicates": 0, "rows_after_dedup": len(primary)},
-            {
-                "dataset": "heart.csv",
-                "rows": len(secondary_original),
-                "exact_duplicates": int(secondary_original.attrs.get("original_rows", len(secondary_original)) - len(secondary_dedup)),
-                "rows_after_dedup": len(secondary_dedup),
-            },
-        ]
-    )
+    duplicate_table = pd.DataFrame([
+        {"dataset": "heart_disease_uci.csv", "rows": len(primary),
+         "exact_duplicates": 0, "rows_after_dedup": len(primary)},
+        {"dataset": "heart.csv", "rows": len(secondary_original),
+         "exact_duplicates": int(secondary_original.attrs.get("original_rows", len(secondary_original)) - len(secondary_dedup)),
+         "rows_after_dedup": len(secondary_dedup)},
+    ])
     duplicate_table.to_csv(tables_dir / "duplicate_audit.csv", index=False)
 
     dictionary = pd.DataFrame([vars(v) for v in FEATURE_DICTIONARY.values()])
     dictionary.to_csv(tables_dir / "data_dictionary.csv", index=False)
 
-    plots.missingness_heatmap(primary.drop(columns=["id"], errors="ignore"), figures_dir / "missingness_heatmap.png")
+    plots.missingness_heatmap(primary.drop(columns=["id"], errors="ignore"),
+                              figures_dir / "missingness_heatmap.png")
     plots.class_distribution(primary, TARGET_BINARY, figures_dir / "class_distribution_primary.png")
-    plots.site_distribution(primary, GROUP_COLUMN, TARGET_BINARY, figures_dir / "site_distribution_primary.png")
+    plots.site_distribution(primary, GROUP_COLUMN, TARGET_BINARY,
+                            figures_dir / "site_distribution_primary.png")
 
-    _write_data_audit_doc(primary, secondary_original, secondary_dedup, missing_primary, duplicate_table, source_manifest)
+    _write_data_audit_doc(primary, secondary_original, secondary_dedup,
+                          missing_primary, duplicate_table, source_manifest)
     _write_leakage_doc(secondary_original, secondary_dedup)
     return {
-        "primary": primary,
-        "secondary_dedup": secondary_dedup,
-        "source_manifest": source_manifest,
-        "missing_primary": missing_primary,
+        "primary": primary, "secondary_dedup": secondary_dedup,
+        "source_manifest": source_manifest, "missing_primary": missing_primary,
         "duplicate_table": duplicate_table,
     }
 
 
-def write_result_documents(config: dict[str, Any], champion: str, summary: pd.DataFrame, bootstrap: pd.DataFrame) -> None:
+def write_result_documents(
+    config: dict[str, Any], champion: str,
+    summary: pd.DataFrame, bootstrap: pd.DataFrame,
+) -> None:
     reports_dir = resolve_path(config["paths"]["reports_dir"])
     reports_dir.mkdir(parents=True, exist_ok=True)
     top = summary.loc[summary["model"] == champion].iloc[0]
@@ -92,46 +97,73 @@ Selected model: `{champion}`
 
 ## Intended Use
 
-Educational and research-oriented heart disease risk prediction using public benchmark data. This is not a medical device and is not intended for clinical deployment.
+Educational and research-oriented heart disease risk prediction using public
+benchmark data. This is not a medical device and is not intended for clinical
+deployment.
 
 ## Selection Rationale
 
-The model was selected using discrimination, calibration, center-to-center stability, and interpretability. Accuracy alone was not used as the selection criterion.
+The model was selected using a composite ranking of discrimination (AUROC,
+AUPRC, MCC, F1), calibration (Brier score, calibration slope), cross-centre
+stability (AUROC standard deviation), and interpretability.
 
 ## Primary Validation
 
-Leave-one-center-out internal-external cross-validation using the UCI dataset center variable.
+Leave-one-centre-out internal–external cross-validation using the UCI dataset
+centre variable, ensuring geographic generalisability.
 
 ## Key Aggregate Metrics
 
-- Mean AUROC: {top['auroc_mean']:.3f}
-- Mean AUPRC: {top['auprc_mean']:.3f}
-- Mean Brier score: {top['brier_mean']:.3f}
-- Mean balanced accuracy: {top['balanced_accuracy_mean']:.3f}
-- Mean MCC: {top['mcc_mean']:.3f}
+| Metric | Value |
+|---|---|
+| Mean AUROC | {top['auroc_mean']:.4f} |
+| Mean AUPRC | {top['auprc_mean']:.4f} |
+| Mean Brier score | {top['brier_mean']:.4f} |
+| Mean Balanced accuracy | {top['balanced_accuracy_mean']:.4f} |
+| Mean F1 | {top['f1_mean']:.4f} |
+| Mean MCC | {top['mcc_mean']:.4f} |
+| Mean Sensitivity | {top['sensitivity_mean']:.4f} |
+| Mean Specificity | {top['specificity_mean']:.4f} |
+
+## Bootstrap 95% Confidence Intervals
+
+{bootstrap.to_markdown(index=False)}
+
+## Statistical Significance
+
+DeLong, Friedman–Nemenyi, and McNemar tests are reported in `reports/tables/`.
 
 ## Limitations
 
-The public datasets are small, historical, partially missing, and not representative of modern prospective care. The supplementary `heart.csv` file has extensive duplicate rows and uncertain target semantics relative to the UCI `num > 0` definition.
+The public datasets are small, historical, partially missing, and not
+representative of modern prospective care. The supplementary `heart.csv` file
+has extensive duplicate rows and uncertain target semantics relative to the
+UCI `num > 0` definition.
 """
     (reports_dir / "model_card.md").write_text(model_card, encoding="utf-8")
 
 
-def _write_data_audit_doc(primary: pd.DataFrame, secondary_original: pd.DataFrame, secondary_dedup: pd.DataFrame, missing: pd.DataFrame, duplicates: pd.DataFrame, manifest: pd.DataFrame) -> None:
+def _write_data_audit_doc(
+    primary, secondary_original, secondary_dedup,
+    missing, duplicates, manifest,
+) -> None:
     doc = f"""# Data Audit Report
 
 ## Primary Dataset
 
-`heart_disease_uci.csv` is used as the primary research dataset because it contains a `dataset` center variable enabling internal-external validation.
+`heart_disease_uci.csv` is used as the primary research dataset because it
+contains a `dataset` centre variable enabling internal-external validation.
 
 - Rows: {len(primary)}
-- Centers: {primary[GROUP_COLUMN].nunique()}
-- Binary target absent/present counts: {primary[TARGET_BINARY].value_counts().sort_index().to_dict()}
-- Center counts: {primary[GROUP_COLUMN].value_counts().to_dict()}
+- Centres: {primary[GROUP_COLUMN].nunique()}
+- Binary target counts: {primary[TARGET_BINARY].value_counts().sort_index().to_dict()}
+- Centre counts: {primary[GROUP_COLUMN].value_counts().to_dict()}
 
 ## Missingness
 
-Substantial missingness is present, especially in variables such as `ca`, `thal`, and `slope`. Missing values are not imputed globally; imputation is performed inside training folds.
+Substantial missingness is present, especially in `ca`, `thal`, and `slope`.
+Missing values are imputed inside training folds (median for numeric, mode for
+categorical) to prevent leakage.
 
 Top missing variables:
 
@@ -149,33 +181,43 @@ Top missing variables:
 
 {manifest.to_markdown(index=False)}
 """
+    Path("docs").mkdir(parents=True, exist_ok=True)
     Path("docs/data_audit_report.md").write_text(doc, encoding="utf-8")
 
 
-def _write_leakage_doc(secondary_original: pd.DataFrame, secondary_dedup: pd.DataFrame) -> None:
+def _write_leakage_doc(secondary_original, secondary_dedup) -> None:
     duplicate_count = len(secondary_original) - len(secondary_dedup)
     doc = f"""# Leakage Audit Report
 
 ## Major Risks and Controls
 
-1. Duplicate leakage in `heart.csv`.
+1. **Duplicate leakage** in `heart.csv`.
    - Exact duplicate rows detected: {duplicate_count}
-   - Control: the supplementary benchmark uses exact-row deduplication before any split.
+   - Control: supplementary benchmark uses exact-row deduplication before split.
 
-2. Test-set leakage in the original notebook.
+2. **Test-set leakage** in the original notebook.
    - The notebook tuned neural-network variants using `validation_data=(X_test, y_test)`.
-   - Control: the package uses inner group-aware cross-validation on development centers only.
+   - Control: the package uses inner group-aware cross-validation on development centres only.
 
-3. Preprocessing leakage.
-   - Control: imputation, scaling, and one-hot encoding are contained in sklearn pipelines and fitted only inside training folds.
+3. **Preprocessing leakage**.
+   - Control: imputation, scaling, one-hot encoding, and SMOTE are contained in
+     sklearn/imblearn pipelines and fitted only inside training folds.
 
-4. Site leakage.
-   - Control: the center variable is used for validation grouping and is not used as a model predictor.
+4. **Site leakage**.
+   - Control: the centre variable is used for validation grouping and is not used
+     as a model predictor.
 
-5. Target-definition leakage or semantic mismatch.
-   - Control: the primary target is defined only from UCI `num > 0`. The benchmark `heart.csv` is not pooled with UCI.
+5. **Target-definition leakage** or semantic mismatch.
+   - Control: the primary target is defined only from UCI `num > 0`. The benchmark
+     `heart.csv` is not pooled with UCI.
 
-6. Artifact traceability.
-   - Control: source file hashes, configuration, selected model metadata, and validation tables are written to `reports/` and `artifacts/`.
+6. **Artifact traceability**.
+   - Control: source file hashes, configuration, selected model metadata, and
+     validation tables are written to `reports/` and `artifacts/`.
+
+7. **SMOTE leakage**.
+   - Control: SMOTE is applied via `imblearn.pipeline.Pipeline` inside training
+     folds only. Test-fold samples are never synthesised.
 """
+    Path("docs").mkdir(parents=True, exist_ok=True)
     Path("docs/leakage_audit_report.md").write_text(doc, encoding="utf-8")

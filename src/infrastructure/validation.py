@@ -12,6 +12,11 @@ VALID_MODELS = {
     "gradient_boosting",
     "calibrated_gradient_boosting",
     "mlp_notebook_baseline",
+    "xgboost",
+    "lightgbm",
+    "catboost",
+    "svm_rbf",
+    "stacking_ensemble",
 }
 
 

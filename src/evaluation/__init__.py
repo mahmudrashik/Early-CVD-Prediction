@@ -1,2 +1,1 @@
-"""Evaluation metrics, validation helpers, and reporting tables."""
-
+"""Evaluation package — metrics, selection, explainability, statistical tests."""

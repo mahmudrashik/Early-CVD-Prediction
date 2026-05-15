@@ -15,10 +15,21 @@ paths:
 validation:
   group_column: center
   threshold: 0.5
-  bootstrap_iterations: 200
+  bootstrap_iterations: 2000
   thresholds: [0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90]
   outer_strategy: leave_one_center_out
   inner_strategy: group_k_fold
+
+preprocessing:
+  smote: true
+  feature_engineering: true
+  smote_k_neighbors: 3
+
+optimization:
+  engine: randomized          # randomized | optuna
+  randomized_n_iter: 60
+  optuna_n_trials: 100
+  optuna_timeout_seconds: 300
 
 models:
   include:
@@ -27,8 +38,14 @@ models:
     - gradient_boosting
     - calibrated_gradient_boosting
     - mlp_notebook_baseline
+    - xgboost
+    - lightgbm
+    - catboost
+    - svm_rbf
+    - stacking_ensemble
 
 reporting:
   positive_label: heart disease present
-  caution: This is a research prototype trained on public benchmark data and is not a clinical diagnostic device.
-
+  caution: >-
+    This is a research prototype trained on public benchmark data
+    and is not a clinical diagnostic device.

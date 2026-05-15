@@ -1,13 +1,12 @@
 # Early CVD Prediction Using Clinical Data: A Leakage-Audited and Explainable Machine Learning Study
 
-Mahmud Rashik  
-Department of Computer Science and Engineering  
+Rashik Mahmud Majumder, Ravian Irtisam, Shahariar Hossain, Rumana Yasmin, Md. Sakib Hasan, and Samia Ahmed  
 Bangladesh University of Professionals  
 Dhaka, Bangladesh
 
 ## Abstract
 
-Cardiovascular disease prediction from routine clinical variables is a common machine-learning laboratory problem, but public benchmark studies can overstate performance when duplicate rows, missingness, validation leakage, and calibration are not handled carefully. This project develops Early CVD Prediction as a reproducible and explainable heart-disease prediction workflow using a primary UCI-style multi-center dataset and a secondary heart.csv benchmark. The main binary outcome collapsed num = 1-4 into disease presence and retained num = 0 as disease absence. The primary dataset contained 920 records from Cleveland, Hungary, Switzerland, and VA Long Beach; the secondary file contained 1025 rows but only 302 unique rows after exact deduplication. The main experiment used leave-one-center-out internal-external validation with all preprocessing fitted inside training folds. Penalized logistic regression, random forest, gradient boosting, calibrated gradient boosting, and a multilayer perceptron baseline were compared using discrimination, calibration, threshold behavior, stability, and interpretability. Penalized logistic regression was selected because it achieved a strong overall balance: mean held-out-center AUROC 0.799, AUPRC 0.880, Brier score 0.168, and balanced accuracy 0.745. The work includes a compatible notebook, generated figures and tables, tests, and a FastAPI localhost application with probability and explanation output. The system is a research and educational prototype, not a clinically deployed diagnostic device.
+Cardiovascular disease prediction from routine clinical variables is a common machine-learning laboratory problem, but public benchmark studies can overstate performance when duplicate rows, missingness, validation leakage, and calibration are not handled carefully. This project develops Early CVD Prediction as a reproducible and explainable heart-disease prediction workflow using a primary UCI-style multi-center dataset and a secondary heart.csv benchmark. The main binary outcome collapsed num = 1-4 into disease presence and retained num = 0 as disease absence. The primary dataset contained 920 records from Cleveland, Hungary, Switzerland, and VA Long Beach; the secondary file contained 1025 rows but only 302 unique rows after exact deduplication. The main experiment used leave-one-center-out internal-external validation with all preprocessing fitted inside training folds. Ten candidate models were compared, including interpretable baselines, tree ensembles, calibrated boosting, RBF SVM, XGBoost, LightGBM, CatBoost, stacking, and a multilayer perceptron baseline. Calibrated gradient boosting was selected by the composite ranking because it achieved the best overall balance: mean held-out-center AUROC 0.808, AUPRC 0.882, Brier score 0.155, balanced accuracy 0.744, and MCC 0.439. In pooled held-out-center predictions, the selected model achieved AUROC 0.859, AUPRC 0.866, Brier score 0.152, and balanced accuracy 0.784. The work includes a compatible notebook, generated figures and tables, statistical comparisons, tests, and a FastAPI localhost application with probability and explanation output. The system is a research and educational prototype, not a clinically deployed diagnostic device.
 
 **Keywords**: cardiovascular disease prediction, heart disease, machine learning, calibration, explainable AI, site-aware validation
 
@@ -47,9 +46,53 @@ The secondary dataset was heart.csv. It was not assumed to be clean. Exact dupli
 
 The feature schema was standardized across files. Naming differences such as thalach and thalch, and target and num, were handled through a canonical dictionary. Numeric predictors were median-imputed and standardized. Categorical predictors were imputed with the most frequent value and one-hot encoded. All preprocessing was inside scikit-learn pipelines so imputation, scaling, encoding, and model fitting were learned only from training folds. This is the central leakage-control decision in the project.
 
-Five model families were evaluated: penalized logistic regression, random forest, gradient boosting, calibrated gradient boosting, and a multilayer perceptron baseline preserving the direction of the original neural-network notebook. The final selection principle was methodological rather than cosmetic: accuracy alone could not determine the champion model. A model was preferred only if it showed a balanced profile across discrimination, calibration, stability, interpretability, and suitability for a small tabular clinical dataset.
+Ten model families were evaluated: penalized logistic regression, random forest, gradient boosting, calibrated gradient boosting, RBF SVM, XGBoost, LightGBM, CatBoost, heterogeneous stacking, and a multilayer perceptron baseline preserving the direction of the original neural-network notebook. The final selection principle was methodological rather than cosmetic: accuracy alone could not determine the champion model. A model was preferred only if it showed a balanced profile across discrimination, calibration, stability, interpretability, and suitability for a small tabular clinical dataset.
 
 The localhost application uses FastAPI with Pydantic validation and a lightweight integrated HTML interface. This choice keeps the project simple for submission and presentation while still providing automatic API documentation. The public workflow uses one clinical input form, reports calibrated probability and risk category, displays important feature contributions, and includes a research-prototype disclaimer.
+
+**Figure III.A. Core Methodology Flowchart**
+
+```mermaid
+graph TD
+    A["DATA ACQUISITION"] --> B["Data Input"]
+    B --> B1["Primary: heart_disease_uci.csv<br/>Secondary: heart.csv"]
+
+    B1 --> C["DATA VALIDATION"]
+    C --> C1["Duplicate Detection<br/>Missing Value Analysis<br/>Distribution Audit"]
+
+    C1 --> D["PREPROCESSING PIPELINE"]
+    D --> D1["Feature Standardization<br/>Canonical Dictionary Mapping"]
+    D1 --> D2["Numeric Features:<br/>Median Imputation -> Standardization<br/><br/>Categorical Features:<br/>Mode Imputation -> One-Hot Encoding"]
+    D2 --> D3["Leakage Control:<br/>Inside scikit-learn Pipelines<br/>Fit on Training Folds Only"]
+
+    D3 --> E["VALIDATION STRATEGY"]
+    E --> E1["Internal-External Validation<br/>Hold-out Each Center"]
+    E1 --> E2["Development: Remaining Centers<br/>Test: Held-out Center"]
+
+    E2 --> F["MODEL DEVELOPMENT"]
+    F --> F1["Penalized Logistic Regression<br/>Random Forest<br/>Gradient Boosting<br/>Calibrated Gradient Boosting<br/>RBF SVM<br/>XGBoost / LightGBM / CatBoost<br/>Stacking Ensemble<br/>Multilayer Perceptron"]
+
+    F1 --> G["MODEL EVALUATION"]
+    G --> G1["Discrimination: AUC/Sensitivity/Specificity<br/>Calibration: Calibration Curves<br/>Stability: Cross-fold Consistency<br/>Interpretability: Feature Importance<br/>Fit: Dataset Suitability"]
+
+    G1 --> H["MODEL SELECTION"]
+    H --> H2["Balanced Profile Across:<br/>Discrimination<br/>Calibration<br/>Stability<br/>Interpretability<br/>Clinical Suitability"]
+
+    H2 --> I["DEPLOYMENT"]
+    I --> I1["FastAPI Application<br/>Pydantic Validation<br/>HTML Interface"]
+    I1 --> I2["Clinical Input Form<br/>Calibrated Risk Prediction<br/>Feature Attribution<br/>Research Prototype Disclaimer"]
+
+    style A fill:#e1f5ff
+    style C fill:#f3e5f5
+    style D fill:#fff3e0
+    style E fill:#e8f5e9
+    style F fill:#fce4ec
+    style G fill:#f1f8e9
+    style H fill:#e0f2f1
+    style I fill:#ede7f6
+```
+
+The flowchart above visualizes the complete methodology pipeline from data acquisition through deployment. Each stage enforces specific controls: data validation ensures file integrity and duplicate detection; the preprocessing pipeline implements all feature engineering inside training folds to prevent leakage; the validation strategy approximates new-site behavior through leave-one-center-out folds; model evaluation balances multiple criteria rather than optimizing for a single metric; and deployment provides both risk estimates and explainable feature contributions with an appropriate clinical disclaimer.
 
 **Table II. Dataset Audit Summary**
 
@@ -75,7 +118,7 @@ The localhost application uses FastAPI with Pydantic validation and a lightweigh
 
 The main experiment used leave-one-center-out validation on the primary dataset. In each outer fold, one center was held out. Model selection was performed only on the development centers, and the selected candidate was evaluated on the held-out center. This avoids using the held-out center to choose preprocessing or hyperparameters.
 
-Metrics included AUROC, AUPRC, accuracy, balanced accuracy, sensitivity, specificity, precision or positive predictive value, negative predictive value, F1 score, Matthews correlation coefficient, Brier score, calibration intercept, calibration slope, confusion matrix, and threshold analysis. Bootstrap confidence intervals were calculated for key pooled held-out predictions. Generated artifacts include ROC, precision-recall, calibration, decision-curve, confusion-matrix, missingness, distribution, feature-importance, and SHAP-style figures.
+Metrics included AUROC, AUPRC, accuracy, balanced accuracy, sensitivity, specificity, precision or positive predictive value, negative predictive value, F1 score, Matthews correlation coefficient, Brier score, calibration intercept, calibration slope, confusion matrix, and threshold analysis. Bootstrap confidence intervals were calculated for key pooled held-out predictions. Generated artifacts include ROC, precision-recall, calibration, decision-curve, threshold-sensitivity, probability-distribution, confusion-matrix, learning-curve, statistical-test, missingness, distribution, feature-importance, and SHAP-style figures.
 
 Ablation and comparative analyses focused on four practical questions: whether the neural network was better than simpler tabular models, whether threshold choice changed clinical operating behavior, whether center-to-center performance was stable, and whether duplicate-expanded heart.csv results differed from deduplicated benchmark results.
 
@@ -85,64 +128,69 @@ The data audit showed that the primary dataset is small and heterogeneous but us
 
 Missingness was clinically and methodologically important. The most incomplete variables were ca (66.4% missing), thal (52.8%), slope (33.6%), fbs (9.8%), oldpeak (6.7%), trestbps (6.4%), exang (6.0%), and thalach (6.0%). Since these missing values can be center-dependent, imputation was deliberately performed inside each training fold.
 
-The primary model comparison did not support choosing the neural network as the final model. Calibrated gradient boosting had the highest mean AUROC, but penalized logistic regression achieved the best overall compromise after considering AUPRC, Brier score, balanced accuracy, MCC, calibration behavior, and interpretability. This is consistent with the practical lesson that small tabular clinical datasets do not automatically benefit from deeper models.
+The primary model comparison did not support choosing the neural network as the final model. RBF SVM had the highest mean AUROC and AUPRC, but it had weak specificity and balanced accuracy at the selected threshold. Calibrated gradient boosting achieved the best composite ranking after considering discrimination, Brier score, F1, MCC, calibration slope, center stability, and interpretability. This is consistent with the practical lesson that small tabular clinical datasets do not automatically benefit from deeper models.
 
-For pooled held-out-center predictions, the selected logistic regression model achieved AUROC 0.855, AUPRC 0.864, Brier score 0.159, and balanced accuracy 0.785. At threshold 0.50, sensitivity was 0.729 and specificity was 0.842. Lowering the threshold to 0.30 increased sensitivity but reduced specificity; raising it to 0.70 did the opposite. Therefore, the application reports a probability and risk category rather than claiming a universal diagnostic threshold.
+For pooled held-out-center predictions, the selected calibrated gradient boosting model achieved AUROC 0.859, AUPRC 0.866, Brier score 0.152, and balanced accuracy 0.784. At threshold 0.50, sensitivity was 0.806 and specificity was 0.762. Lowering the threshold to 0.30 increased sensitivity but reduced specificity; raising it to 0.70 did the opposite. Therefore, the application reports a probability and risk category rather than claiming a universal diagnostic threshold.
 
 Center-wise results showed important generalizability differences. Performance was strongest for Cleveland and Hungary, lower for Switzerland and VA Long Beach, and calibration was not uniform across sites. These results are scientifically useful because they show where the public dataset is fragile. The project therefore presents the model as a benchmark and decision-support prototype for education, not as a clinical device.
 
-The explanation analysis identified chest pain type, sex, exercise-induced angina, thal category, ST slope, oldpeak, cholesterol, and fasting blood sugar as influential variables. These are plausible for a heart-disease benchmark, but the interpretation remains associational. The explanation layer is meant to answer why the model produced a prediction for the entered profile in terms of learned patterns, not to replace clinical judgment.
+The explanation analysis identified chest pain type, cholesterol, oldpeak, exercise-induced angina, sex, age, thal category, and maximum heart rate as influential variables. These are plausible for a heart-disease benchmark, but the interpretation remains associational. The explanation layer is meant to answer why the model produced a prediction for the entered profile in terms of learned patterns, not to replace clinical judgment.
 
 **Table IV. Primary Model Comparison**
 
 | Model | AUROC | AUPRC | Brier | Balanced Acc. | MCC |
 | --- | --- | --- | --- | --- | --- |
-| Penalized logistic regression | 0.799 | 0.880 | 0.168 | 0.745 | 0.441 |
-| Calibrated gradient boosting | 0.809 | 0.877 | 0.174 | 0.714 | 0.385 |
-| Random forest | 0.800 | 0.873 | 0.170 | 0.716 | 0.387 |
-| Gradient boosting | 0.793 | 0.861 | 0.180 | 0.732 | 0.410 |
-| MLP notebook baseline | 0.779 | 0.858 | 0.187 | 0.678 | 0.342 |
+| Calibrated gradient boosting | 0.808 | 0.882 | 0.155 | 0.744 | 0.439 |
+| RBF SVM | 0.813 | 0.883 | 0.162 | 0.678 | 0.392 |
+| Random forest | 0.803 | 0.875 | 0.168 | 0.729 | 0.409 |
+| Penalized logistic regression | 0.780 | 0.871 | 0.180 | 0.734 | 0.421 |
+| Stacking ensemble | 0.786 | 0.863 | 0.176 | 0.736 | 0.414 |
+| CatBoost | 0.792 | 0.871 | 0.176 | 0.719 | 0.393 |
+| Gradient boosting | 0.794 | 0.864 | 0.185 | 0.735 | 0.404 |
+| XGBoost | 0.792 | 0.871 | 0.184 | 0.694 | 0.361 |
+| LightGBM | 0.772 | 0.863 | 0.182 | 0.699 | 0.370 |
+| MLP notebook baseline | 0.754 | 0.855 | 0.184 | 0.704 | 0.381 |
 
 **Table V. Held-Out Center Results for the Selected Model**
 
 | Held-Out Center | AUROC | AUPRC | Brier | Balanced Acc. | Sensitivity | Specificity |
 | --- | --- | --- | --- | --- | --- | --- |
-| Cleveland | 0.867 | 0.867 | 0.145 | 0.802 | 0.755 | 0.848 |
-| Hungary | 0.876 | 0.828 | 0.132 | 0.790 | 0.660 | 0.920 |
-| Switzerland | 0.742 | 0.972 | 0.204 | 0.727 | 0.704 | 0.750 |
-| VA Long Beach | 0.709 | 0.853 | 0.189 | 0.660 | 0.772 | 0.549 |
+| Cleveland | 0.867 | 0.865 | 0.151 | 0.792 | 0.820 | 0.764 |
+| Hungary | 0.897 | 0.837 | 0.130 | 0.818 | 0.802 | 0.834 |
+| Switzerland | 0.745 | 0.971 | 0.154 | 0.708 | 0.791 | 0.625 |
+| VA Long Beach | 0.723 | 0.857 | 0.183 | 0.658 | 0.805 | 0.510 |
 
 **Table VI. Bootstrap Confidence Intervals for Pooled Held-Out Predictions**
 
 | Metric | Estimate | 95% CI |
 | --- | --- | --- |
-| Auroc | 0.855 | 0.828-0.878 |
-| Auprc | 0.864 | 0.825-0.893 |
-| Balanced Accuracy | 0.785 | 0.756-0.811 |
-| Brier | 0.159 | 0.145-0.173 |
-| Sensitivity | 0.729 | 0.690-0.766 |
-| Specificity | 0.842 | 0.804-0.875 |
+| AUROC | 0.859 | 0.835-0.883 |
+| AUPRC | 0.866 | 0.831-0.900 |
+| Balanced Accuracy | 0.784 | 0.757-0.810 |
+| Brier | 0.152 | 0.139-0.164 |
+| Sensitivity | 0.806 | 0.772-0.841 |
+| Specificity | 0.762 | 0.722-0.802 |
 
 **Table VII. Threshold Operating Points for the Selected Model**
 
 | Threshold | Sensitivity | Specificity | PPV | NPV | Balanced Acc. | MCC |
 | --- | --- | --- | --- | --- | --- | --- |
-| 0.300 | 0.876 | 0.637 | 0.750 | 0.806 | 0.757 | 0.534 |
-| 0.500 | 0.729 | 0.842 | 0.851 | 0.715 | 0.785 | 0.568 |
-| 0.700 | 0.525 | 0.925 | 0.896 | 0.611 | 0.725 | 0.477 |
+| 0.300 | 0.925 | 0.550 | 0.718 | 0.856 | 0.738 | 0.522 |
+| 0.500 | 0.806 | 0.762 | 0.807 | 0.760 | 0.784 | 0.567 |
+| 0.700 | 0.591 | 0.915 | 0.896 | 0.644 | 0.753 | 0.523 |
 
-**Table VIII. Top Global Explanation Features**
+**Table VIII. Top Global Explanation Features (Permutation Importance)**
 
 | Feature | Importance |
 | --- | --- |
-| cp | 1.921 |
-| sex | 0.934 |
-| exang | 0.868 |
-| thal | 0.739 |
-| slope | 0.598 |
-| oldpeak | 0.512 |
-| chol | 0.447 |
-| fbs | 0.399 |
+| cp | 0.060 |
+| chol | 0.047 |
+| oldpeak | 0.021 |
+| exang | 0.020 |
+| sex | 0.012 |
+| age | 0.008 |
+| thal | 0.007 |
+| thalach | 0.007 |
 
 **Fig. 1. Class distribution in the primary UCI-style dataset.**
 
@@ -160,56 +208,82 @@ The explanation analysis identified chest pain type, sex, exercise-induced angin
 
 ![Model comparison across site-aware validation folds.](../figures/model_comparison.png)
 
-**Fig. 5. ROC curves from held-out-center predictions.**
+**Fig. 5. Multi-metric model comparison across selected performance criteria.**
+
+![Multi-metric model comparison across selected performance criteria.](../figures/model_comparison_multi_metric.png)
+
+**Fig. 6. Model performance radar showing discrimination, calibration, and threshold behavior.**
+
+![Model performance radar showing discrimination, calibration, and threshold behavior.](../figures/radar_chart.png)
+
+**Fig. 7. ROC curves from held-out-center predictions.**
 
 ![ROC curves from held-out-center predictions.](../figures/roc_curves.png)
 
-**Fig. 6. Precision-recall curves from held-out-center predictions.**
+**Fig. 8. Precision-recall curves from held-out-center predictions.**
 
 ![Precision-recall curves from held-out-center predictions.](../figures/precision_recall_curves.png)
 
-**Fig. 7. Calibration curves for compared models.**
+**Fig. 9. Calibration curves for compared models.**
 
 ![Calibration curves for compared models.](../figures/calibration_plots.png)
 
-**Fig. 8. Confusion matrix for the selected model at threshold 0.50.**
+**Fig. 10. Confusion matrix for the selected model at threshold 0.50.**
 
 ![Confusion matrix for the selected model at threshold 0.50.](../figures/confusion_matrix_champion.png)
 
-**Fig. 9. Decision-curve analysis for threshold-probability ranges.**
+**Fig. 11. Predicted probability distribution by observed class.**
+
+![Predicted probability distribution by observed class.](../figures/predicted_probability_violin.png)
+
+**Fig. 12. Threshold sensitivity analysis for F1, sensitivity, and specificity.**
+
+![Threshold sensitivity analysis for F1, sensitivity, and specificity.](../figures/threshold_sensitivity.png)
+
+**Fig. 13. Decision-curve analysis for threshold-probability ranges.**
 
 ![Decision-curve analysis for threshold-probability ranges.](../figures/decision_curve.png)
 
-**Fig. 10. Global feature importance for the selected model.**
+**Fig. 14. Global feature importance for the selected model.**
 
 ![Global feature importance for the selected model.](../figures/global_feature_importance.png)
 
-**Fig. 11. SHAP-style summary plot for explanation review.**
+**Fig. 15. SHAP-style summary plot for explanation review.**
 
 ![SHAP-style summary plot for explanation review.](../figures/shap_summary.png)
 
+**Fig. 16. Learning curve for the selected model.**
+
+![Learning curve for the selected model.](../figures/learning_curves.png)
+
+**Fig. 17. DeLong pairwise AUROC test heatmap.**
+
+![DeLong pairwise AUROC test heatmap.](../figures/delong_heatmap.png)
+
 ## VI. Ablation Studies / Comparative Studies
 
-The main comparative study is the model-family comparison. The MLP baseline was preserved from the original notebook direction but underperformed logistic regression and tree-based models on several metrics. This supports the final decision to keep the neural network as a comparator rather than the champion.
+The main comparative study is the model-family comparison. The MLP baseline was preserved from the original notebook direction but underperformed the calibrated gradient boosting, SVM, random-forest, logistic-regression, and stacking alternatives on the composite ranking. This supports the final decision to keep the neural network as a comparator rather than the champion.
 
-The duplicate sensitivity analysis showed why heart.csv is supplementary. The duplicate-expanded version produced slightly stronger apparent performance than the deduplicated version. Because duplicate rows can make evaluation easier and less realistic, the deduplicated result is the only defensible supplementary benchmark.
+The duplicate sensitivity analysis showed why heart.csv is supplementary. The duplicate-expanded version produced stronger apparent performance than the deduplicated version, especially AUROC 0.955 versus 0.903 and Brier score 0.086 versus 0.126. Because duplicate rows can make evaluation easier and less realistic, the deduplicated result is the only defensible supplementary benchmark.
 
 The threshold analysis showed a clear sensitivity-specificity trade-off. A lower threshold is more sensitive and may be useful for screening-oriented analysis, whereas a higher threshold is more specific and reduces false positives. Since the project is not clinically deployed, no single operating threshold is recommended as medically optimal.
 
 The center sensitivity analysis is the most important ablation for scientific honesty. Holding out Switzerland and VA Long Beach produced weaker performance than holding out Cleveland and Hungary. This indicates distribution shift between centers and justifies the report limitation that prospective validation would be required before any clinical use.
 
+The statistical comparison artifacts add another check on the model claims. DeLong pairwise testing on pooled held-out predictions found several significant AUROC differences, including calibrated gradient boosting versus the MLP baseline and XGBoost. However, the per-center Friedman test was not significant at the 0.05 level (chi-square = 15.109, p = 0.088), which is expected given only four held-out centers and supports cautious interpretation rather than overclaiming superiority.
+
 **Table IX. Duplicate Sensitivity on the Supplementary heart.csv Dataset**
 
 | Dataset Version | AUROC | AUPRC | Balanced Acc. | Brier | MCC |
 | --- | --- | --- | --- | --- | --- |
-| Deduplicated heart.csv | 0.909 | 0.917 | 0.832 | 0.125 | 0.677 |
-| Duplicate-expanded heart.csv | 0.924 | 0.926 | 0.855 | 0.110 | 0.715 |
+| Deduplicated heart.csv | 0.903 | 0.912 | 0.829 | 0.126 | 0.666 |
+| Duplicate-expanded heart.csv | 0.955 | 0.955 | 0.870 | 0.086 | 0.742 |
 
 ## VII. Conclusion and Future Work
 
 This project satisfies the ML Lab objective by building a complete early CVD prediction workflow from clinical tabular data while correcting the weaknesses of the initial notebook-only approach. The final system contains a reproducible notebook, modular Python code, leakage-safe training and evaluation, generated figures and tables, a FastAPI localhost application, tests, and an IEEE-style report.
 
-The selected model is penalized logistic regression because it is competitive, calibrated more favorably than the alternatives, stable enough across the available centers, and easier to explain. Future work should evaluate the model on newer prospective cohorts, add stronger clinical baselines, improve calibration by site, examine fairness across patient subgroups, and validate the user interface with clinical stakeholders. Until then, the project should be described as a reproducible educational benchmark and research prototype, not as a clinical diagnostic system.
+The selected model is calibrated gradient boosting because it is competitive across discrimination, has the best mean Brier score, provides strong pooled held-out-center performance, and remains deployable with probability calibration and post-hoc explanation artifacts. Future work should evaluate the model on newer prospective cohorts, add stronger clinical baselines, improve calibration by site, examine fairness across patient subgroups, and validate the user interface with clinical stakeholders. Until then, the project should be described as a reproducible educational benchmark and research prototype, not as a clinical diagnostic system.
 
 ## References
 
